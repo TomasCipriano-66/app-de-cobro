@@ -1,0 +1,198 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" style="padding: 14px; margin-left: 40px;">--- Compras.com ---</a>
+<a class="nav-link" href="{{ url_for('carrito') }}" style="margin-right: 30px;"><img src="static/images/home_ico.png" alt="#" /></a>
+</nav>
+
+<style>
+    .table-container {
+        display: none;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 36px;
+        /* Reducción al 60% de 60px */
+        height: 20px;
+        /* Reducción al 60% de 34px */
+    }
+
+    /* Esconder el checkbox original */
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* Slider */
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 20px;
+        /* Ajustado para mantener proporciones */
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        /* Reducción al 60% de 26px */
+        width: 16px;
+        /* Reducción al 60% de 26px */
+        left: 2px;
+        /* Ajustado para mantener proporciones */
+        bottom: 2px;
+        /* Ajustado para mantener proporciones */
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.slider {
+        background-color: #4CAF50;
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(16px);
+        /* Ajustado para el nuevo tamaño */
+    }
+
+    /* Estilo de las etiquetas */
+    .slider-label {
+        margin-left: 8px;
+        /* Ajustado para el nuevo tamaño */
+        font-size: 14px;
+        /* Ajustado para el nuevo tamaño */
+        vertical-align: middle;
+    }
+</style>
+
+
+<div class="col-md-16" style="margin: 40px;">
+    <div class="admin_bar"
+        style="border: 1px solid #ccc; padding: 20px; border-radius: 5px; display: flex; justify-content: space-between; align-items: flex-start;">
+        
+        
+    </div>
+
+    
+</div>
+
+
+
+
+
+<div id="table1" class="table-container">
+    <table class="table table-striped table-hover table-bordered table-sm bg-white">
+        <thead>
+            <tr>
+                <td>Equipo</td>
+                <td>Colegio</td>
+                <td>Deporte</td>
+                <td>Categoria</td>
+                <td>Telefono</td>
+                <td>DNI</td>
+                <td>Correo</td>
+                <td>Miembros</td>
+                <td>Acompañantes</td>
+                <td>Vegetariano</td>
+                <td>Celiaco</td>
+                <td>Diabetico</td>
+                <td>-------</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inf in Table1_inf %}
+            <tr>
+                <td>{{inf.1}}</td>
+                <td>{{inf.2}}</td>
+                <td>{{inf.3}}</td>
+                <td>{{inf.4}}</td>
+                <td>{{inf.5}}</td>
+                <td>{{inf.6}}</td>
+                <td>{{inf.7}}</td>
+                <td>{{inf.8}}</td>
+                <td>{{inf.9}}</td>
+                <td>{{inf.10}}</td>
+                <td>{{inf.11}}</td>
+                <td>{{inf.12}}</td>
+                <td>
+<!-- 
+                    <a href="{{ url_for('cargar_team', id=inf[0]) }}" class="btn btn-success"
+                        onclick="return confirm('¿Estás seguro de que deseas confirmar este equipo?');">OK</a>
+                    <a href="{{ url_for('get_team', id=inf[0]) }}" class="btn btn-secondary">Editar</a>
+                    <a href="{{ url_for('delete_team', id=inf[0]) }}" class="btn btn-danger btn-delete"
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar este equipo?');">ELIMINAR</a> -->
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<div id="table2" class="table-container">
+    <table class="table table-striped table-hover table-bordered table-sm bg-white">
+        <thead>
+            <tr>
+                <td>Equipo</td>
+                <td>Colegio</td>
+                <td>Deporte</td>
+                <td>Categoria</td>
+                <td>Telefono</td>
+                <td>DNI</td>
+                <td>Correo</td>
+                <td>Miembros</td>
+                <td>Acompañantes</td>
+                <td>Vegetariano</td>
+                <td>Celiaco</td>
+                <td>Diabetico</td>
+                <td>SCORE</td>
+                <td>-------</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inf in Table2_inf %}
+            <tr>
+                <td>{{inf.1}}</td>
+                <td>{{inf.2}}</td>
+                <td>{{inf.3}}</td>
+                <td>{{inf.4}}</td>
+                <td>{{inf.5}}</td>
+                <td>{{inf.6}}</td>
+                <td>{{inf.7}}</td>
+                <td>{{inf.8}}</td>
+                <td>{{inf.9}}</td>
+                <td>{{inf.10}}</td>
+                <td>{{inf.11}}</td>
+                <td>{{inf.12}}</td>
+                <td>{{inf.13}}</td>
+                <td>
+
+                    <!-- <a href="{{ url_for('add_pts', id=inf[0]) }}" class="btn btn-success">+PTS</a>
+                    <a class="btn btn-primary" style="width: 21%; padding: 8px;"
+                        href="{{ url_for('get_team2', id=inf[0]) }}"><img src="static/images/config.png"
+                            style="width: 100%;" /></a> -->
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+
+</script>
+
+{% endblock %}
