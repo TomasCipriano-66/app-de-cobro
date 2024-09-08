@@ -1,59 +1,63 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
-from flask_mysqldb import MySQL
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
+app.secret_key = 'clave_secreta_para_sesiones'  # Necesaria para manejar sesiones
 
-app.config['MYSQL_USER'] = 'unywje4ax5puclwk'
-app.config['MYSQL_PASSWORD'] = 'Uz9KmlHRoqhzEMEQAuAl'
-app.config['MYSQL_HOST'] = 'bgbng8uouisbf7l4ajx0-mysql.services.clever-cloud.com'
-app.config['MYSQL_DB'] = 'bgbng8uouisbf7l4ajx0'
-mysql = MySQL(app)
+# Datos de ejemplo de productos
+productos = [
+    {'id': 1, 'nombre': 'Producto 1', 'precio': 2000, 'img': 'static/images/product1.jpg'},
+    {'id': 2, 'nombre': 'Producto 2', 'precio': 5000, 'img': 'static/images/product2.jpg'},
+    {'id': 3, 'nombre': 'Producto 3', 'precio': 3000, 'img': 'static/images/product3.jpg'}
+]
 
 @app.route('/')
 def home():
-    # Conectar a la base de datos y obtener productos
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT id, nombre, precio, stock, img FROM productos")
-    productos = cursor.fetchall()
-    cursor.close()
     return render_template('home.html', productos=productos)
+
+@app.route('/agregar/<int:producto_id>')
+def agregar_al_carrito(producto_id):
+    # Buscar el producto seleccionado
+    producto_seleccionado = next((item for item in productos if item['id'] == producto_id), None)
+
+    if producto_seleccionado:
+        # Obtener el carrito de la sesión, o crear uno nuevo si no existe
+        if 'carrito' not in session:
+            session['carrito'] = []
+
+        carrito = session['carrito']
+
+        # Verificar si el producto ya está en el carrito
+        producto_en_carrito = next((item for item in carrito if item['id'] == producto_id), None)
+
+        if producto_en_carrito:
+            # Si ya está en el carrito, aumentar la cantidad
+            producto_en_carrito['cantidad'] += 1
+        else:
+            # Si no está, agregarlo al carrito con cantidad 1
+            producto_seleccionado['cantidad'] = 1
+            carrito.append(producto_seleccionado)
+
+        # Guardar el carrito en la sesión
+        session['carrito'] = carrito
+
+    return redirect(url_for('carrito'))
 
 @app.route('/carrito')
 def carrito():
-    # Aquí puedes obtener los datos del carrito desde la sesión o una base de datos
-    # Simulando un carrito
-    carrito = [
-        {'nombre': 'Producto 1', 'cantidad': 1, 'precio': 2000},
-        {'nombre': 'Producto 2', 'cantidad': 3, 'precio': 5000},
-    ]
+    carrito = session.get('carrito', [])
     total = sum(item['precio'] * item['cantidad'] for item in carrito)
     return render_template('carrito.html', carrito=carrito, total=total)
 
+@app.route('/vaciar_carrito')
+def vaciar_carrito():
+    session.pop('carrito', None)  # Eliminar el carrito de la sesión
+    return redirect(url_for('carrito'))
+
 @app.route('/procesar_compra', methods=['POST'])
 def procesar_compra():
-    carrito = [
-        {'nombre': 'Producto 1', 'cantidad': 1, 'precio': 2000},
-        {'nombre': 'Producto 2', 'cantidad': 3, 'precio': 5000},
-    ]
-    total = sum(item['precio'] * item['cantidad'] for item in carrito)
-    
-    # Insertar la compra en la tabla "compras"
-    cursor = mysql.connection.cursor()
-    cursor.execute("INSERT INTO compras (total) VALUES (%s)", (total,))
-    compra_id = cursor.lastrowid
-    
-    # Insertar los productos comprados
-    for item in carrito:
-        cursor.execute(
-            "INSERT INTO productos_comprados (compra_id, nombre, cantidad, precio) VALUES (%s, %s, %s, %s)",
-            (compra_id, item['nombre'], item['cantidad'], item['precio'])
-        )
-    
-    # Confirmar los cambios
-    mysql.connection.commit()
-    cursor.close()
-
-    return redirect(url_for('carrito'))
+    # Aquí podrías procesar el pago o simplemente vaciar el carrito
+    session.pop('carrito', None)  # Vaciar el carrito después de la compra
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)

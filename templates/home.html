@@ -3,7 +3,9 @@
 {% block body %}
 <nav class="navbar navbar-dark bg-dark">
     <a class="navbar-brand" style="padding: 14px; margin-left: 40px;">--- Compras.com ---</a>
-    <a class="nav-link" href="{{ url_for('carrito') }}" style="margin-right: 30px;"><img src="static/images/home_ico.png" alt="#" /></a>
+    <a class="nav-link" href="{{ url_for('carrito') }}" style="margin-right: 30px;">
+        <img src="static/images/home_ico.png" alt="#" />
+    </a>
 </nav>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -13,13 +15,12 @@
         {% for producto in productos %}
         <div class="col-md-4 mb-4">
             <div class="card">
-                <img src="{{ producto[3] }}" class="card-img-top" alt="{{ producto[0] }}" style="width: 100%; height: 280px; object-fit: cover;">
+                <img src="{{ producto.img }}" class="card-img-top" alt="{{ producto.nombre }}" style="width: 100%; height: 280px; object-fit: cover;">
 
                 <div class="card-body">
-                    <h5 class="card-title">{{ producto[0] }}</h5>
-                    <p class="card-text">Precio: ${{ producto[1] }}</p>
-                    <a href="#" class="btn btn-primary" style="width: 100%; object-fit: cover; margin-bottom: 10px;">Comprar</a>
-                    <a href="#" class="btn " style="width: 100%; object-fit: cover; background-color: #7fcbdc46;">Agregar al carrito</a>
+                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                    <p class="card-text">Precio: ${{ producto.precio }}</p>
+                    <a href="{{ url_for('agregar_al_carrito', producto_id=producto.id) }}" class="btn btn-primary" style="width: 100%; object-fit: cover; margin-bottom: 10px;">Agregar al carrito</a>
                 </div>
             </div>
         </div>
