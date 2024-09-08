@@ -1,12 +1,12 @@
-{% extends "layout.html" %}
-
-{% block body %}
-<nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" style="padding: 14px; margin-left: 40px;">--- Carrito ---</a>
-    <a class="nav-link" href="{{ url_for('home') }}" style="margin-right: 30px;">
-        <img src="{{ url_for('static', filename='images/home_ico.png') }}" alt="Home" />
-    </a>
-</nav>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Compra</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
 
 <div class="container">
     <h2 class="mt-5">Resumen de Compra</h2>
@@ -26,7 +26,7 @@
                     <tr>
                         <td>{{ item.nombre }}</td>
                         <td>{{ item.cantidad }}</td>
-                        <td>${{ item.precio }}</td>
+                        <td>${{ item.precio_total }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -39,9 +39,13 @@
                 {% for item in carrito %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     {{ item.nombre }}
-                    <span>${{ item.precio }}</span>
+                    <span>${{ item.precio_total }}</span>
                 </li>
                 {% endfor %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Envío
+                    <span>$precio fijo</span>
+                </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Total
                     <span>${{ total }}</span>
@@ -54,4 +58,5 @@
     </div>
 </div>
 
-{% endblock %}
+</body>
+</html>
