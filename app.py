@@ -1,25 +1,78 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from flask_mysqldb import MySQL
+
 
 app = Flask(__name__)
-app.secret_key = 'clave_secreta_para_sesiones'  # Necesaria para manejar sesiones
+app.secret_key = 'sope_con_pure'
+
+
+app.config['MYSQL_USER'] = 'unywje4ax5puclwk'
+app.config['MYSQL_PASSWORD'] = 'Uz9KmlHRoqhzEMEQAuAl'
+app.config['MYSQL_HOST'] = 'bgbng8uouisbf7l4ajx0-mysql.services.clever-cloud.com'
+app.config['MYSQL_DB'] = 'bgbng8uouisbf7l4ajx0'
+mysql = MySQL(app)
+
+
+
 
 # Datos de ejemplo de productos
-productos = [
-    {'id': 1, 'nombre': 'Producto 1', 'precio': 2000, 'img': 'static/images/product1.jpg'},
-    {'id': 2, 'nombre': 'Producto 2', 'precio': 5000, 'img': 'static/images/product2.jpg'},
-    {'id': 3, 'nombre': 'Producto 3', 'precio': 3000, 'img': 'static/images/product3.jpg'}
-]
-
 @app.route('/')
 def home():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT nombre, precio, img FROM productos")
+    productos_db = cursor.fetchall()
+    cursor.close()
+
+    # Convertir la salida de la base de datos en una lista de diccionarios
+    productos = []
+    for producto in productos_db:
+        productos.append({
+            'nombre': producto[0],
+            'precio': producto[1],
+            'img': producto[2]
+        })
+
     return render_template('home.html', productos=productos)
 
-@app.route('/agregar/<int:producto_id>')
-def agregar_al_carrito(producto_id):
-    # Buscar el producto seleccionado
-    producto_seleccionado = next((item for item in productos if item['id'] == producto_id), None)
+@app.route('/carrito')
+def carrito():
+    carrito = session.get('carrito', [])
 
-    if producto_seleccionado:
+    # Asegurarse de que cada producto tenga stock, en caso de que falte
+    for item in carrito:
+        if 'stock' not in item:
+            # Aquí podrías consultar el stock de la base de datos nuevamente si es necesario
+            cursor = mysql.connection.cursor()
+            cursor.execute("SELECT stock FROM productos WHERE nombre = %s", (item['nombre'],))
+            stock = cursor.fetchone()
+            cursor.close()
+            if stock:
+                item['stock'] = stock[0]
+
+    # Actualizar la sesión con los cambios
+    session['carrito'] = carrito
+
+    total = sum(item['precio'] * item['cantidad'] for item in carrito)
+    return render_template('carrito.html', carrito=carrito, total=total)
+
+
+
+@app.route('/agregar/<producto_nombre>')
+def agregar_al_carrito(producto_nombre):
+    # Consultar el producto por nombre en la base de datos
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT nombre, precio, img, stock FROM productos WHERE nombre = %s", (producto_nombre,))
+    producto = cursor.fetchone()
+    cursor.close()
+
+    if producto:
+        producto_seleccionado = {
+            'nombre': producto[0],
+            'precio': producto[1],
+            'img': producto[2],
+            'stock': producto[3]  # Asegurarse de que stock se incluye
+        }
+
         # Obtener el carrito de la sesión, o crear uno nuevo si no existe
         if 'carrito' not in session:
             session['carrito'] = []
@@ -27,13 +80,14 @@ def agregar_al_carrito(producto_id):
         carrito = session['carrito']
 
         # Verificar si el producto ya está en el carrito
-        producto_en_carrito = next((item for item in carrito if item['id'] == producto_id), None)
+        producto_en_carrito = next((item for item in carrito if item['nombre'] == producto_nombre), None)
 
         if producto_en_carrito:
-            # Si ya está en el carrito, aumentar la cantidad
-            producto_en_carrito['cantidad'] += 1
+            # Verificar si se puede agregar más según el stock disponible
+            if producto_en_carrito['cantidad'] < producto_seleccionado['stock']:
+                producto_en_carrito['cantidad'] += 1
         else:
-            # Si no está, agregarlo al carrito con cantidad 1
+            # Si no está, agregarlo al carrito con cantidad 1 y asegurar que tenga el stock
             producto_seleccionado['cantidad'] = 1
             carrito.append(producto_seleccionado)
 
@@ -42,11 +96,41 @@ def agregar_al_carrito(producto_id):
 
     return redirect(url_for('carrito'))
 
-@app.route('/carrito')
-def carrito():
+
+
+@app.route('/sumar/<producto_nombre>')
+def sumar(producto_nombre):
     carrito = session.get('carrito', [])
-    total = sum(item['precio'] * item['cantidad'] for item in carrito)
-    return render_template('carrito.html', carrito=carrito, total=total)
+
+    # Buscar el producto en el carrito
+    producto_en_carrito = next((item for item in carrito if item['nombre'] == producto_nombre), None)
+
+    if producto_en_carrito:
+        # Solo sumar si no excede el stock disponible
+        if producto_en_carrito['cantidad'] < producto_en_carrito['stock']:
+            producto_en_carrito['cantidad'] += 1
+
+    session['carrito'] = carrito
+    return redirect(url_for('carrito'))
+
+
+@app.route('/restar/<producto_nombre>')
+def restar(producto_nombre):
+    carrito = session.get('carrito', [])
+
+    # Buscar el producto en el carrito
+    producto_en_carrito = next((item for item in carrito if item['nombre'] == producto_nombre), None)
+
+    if producto_en_carrito and producto_en_carrito['cantidad'] > 1:
+        # Decrementar la cantidad si es mayor a 1
+        producto_en_carrito['cantidad'] -= 1
+    elif producto_en_carrito and producto_en_carrito['cantidad'] == 1:
+        # Eliminar el producto si la cantidad es 1 y se presiona restar
+        carrito.remove(producto_en_carrito)
+
+    session['carrito'] = carrito
+    return redirect(url_for('carrito'))
+
 
 @app.route('/vaciar_carrito')
 def vaciar_carrito():
