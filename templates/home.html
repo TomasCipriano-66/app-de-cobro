@@ -6,6 +6,14 @@
     <a class="nav-link" href="{{ url_for('carrito') }}" style="margin-right: 30px;">
         <img src="static/images/home_ico.png" alt="#" />
     </a>
+    <a class="nav-link" href="{{ url_for('login') }}" style="margin-right: 30px;">
+        <img src="static/images/login.png" alt="Login" style="width: 40px; height: 40px;" />
+    </a>
+    <a class="nav-link" href="{{ url_for('signup') }}" style="margin-right: 30px;">
+        <img src="static/images/login.png" alt="Signup" style="width: 40px; height: 40px;" />
+    </a>
+
+    
 </nav>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -20,13 +28,11 @@
                     <h5 class="card-title">{{ producto['nombre'] }}</h5>
                     <p class="card-text">Precio: ${{ producto['precio'] }}</p>
                     <a href="{{ url_for('agregar_al_carrito', producto_nombre=producto['nombre']) }}" class="btn btn-primary" style="width: 100%; object-fit: cover; margin-bottom: 10px;">Agregar al carrito</a>
-
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
-
 
 {% endblock %}

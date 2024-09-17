@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 
-
 app = Flask(__name__)
 app.secret_key = 'sope_con_pure'
 
@@ -33,6 +32,29 @@ def home():
         })
 
     return render_template('home.html', productos=productos)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Lógica de autenticación para login
+        username = request.form['username']
+        password = request.form['password']
+        # Aquí iría la verificación de credenciales en la base de datos
+        return redirect(url_for('home'))
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        # Lógica para el registro de usuarios
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        # Aquí iría la lógica para registrar el usuario en la base de datos
+        return redirect(url_for('home'))
+    return render_template('signup.html')
+
+
 
 @app.route('/carrito')
 def carrito():
@@ -145,3 +167,4 @@ def procesar_compra():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
