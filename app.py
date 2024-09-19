@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'sope_con_pure'
@@ -161,9 +162,61 @@ def vaciar_carrito():
 
 @app.route('/procesar_compra', methods=['POST'])
 def procesar_compra():
-    # Aquí podrías procesar el pago o simplemente vaciar el carrito
+    # if 'username' not in session:  # Cambia 'username' por la clave que uses para la sesión
+    #     return redirect(url_for('login'))
+    carrito = session.get('carrito', [])
+    
+    if not carrito:
+        return redirect(url_for('carrito'))
+
+    # Crear la preferencia de pago
+    url = 'https://api.mercadopago.com/checkout/preferences'
+    headers = {
+        'Authorization': f'Bearer {ACCESS_TOKEN}',  # Tu token de acceso
+        'Content-Type': 'application/json'
+    }
+
+    items = []
+    for item in carrito:
+        items.append({
+            "title": item['nombre'],
+            "quantity": item['cantidad'],
+            "unit_price": item['precio'],
+            "currency_id": "ARS"
+        })
+
+    data = {
+        "items": items,
+        "back_urls": {
+            "success": "http://localhost:5000/success",
+            "failure": "http://localhost:5000/failure",
+            "pending": "http://localhost:5000/pending"
+        },
+        "auto_return": "approved"
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    preference = response.json()
+
+    # Redirigir al usuario a Mercado Pago
+    return redirect(preference['init_point'])
+
+@app.route('/success')
+def success():
+    # Aquí puedes agregar lógica para guardar la compra en la base de datos si es necesario
     session.pop('carrito', None)  # Vaciar el carrito después de la compra
+    session['mensaje'] = "Pago realizado con éxito."  # Mensaje de éxito
     return redirect(url_for('home'))
+
+
+@app.route('/failure')
+def failure():
+    return "Pago fallido"
+
+@app.route('/pending')
+def pending():
+    return "Pago pendiente"
+
 
 if __name__ == '__main__':
     app.run(debug=True)

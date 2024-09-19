@@ -18,6 +18,12 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
+{% if session.get('mensaje') %}
+<div class="alert">
+    {{ session.pop('mensaje') }}  <!-- Muestra y elimina el mensaje -->
+</div>
+{% endif %}
+
 <div class="container" style="margin: 40px;">
     <div class="row">
         {% for producto in productos %}
