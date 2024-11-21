@@ -1,25 +1,35 @@
-# Copa Renault - Página Web del Evento Deportivo
+# App de Cobro Prototipo
 
-Este proyecto consiste en una página web para el evento deportivo "Copa Renault", desarrollada con Flask y MySQL. La página permite administrar una base de datos que puede ser modificada directamente desde la aplicación web. Los participantes pueden inscribirse a través de formularios, cuyos datos se cargan automáticamente en la base de datos.
+Una aplicación web sencilla e intuitiva para realizar pagos en línea. La app permite a los usuarios agregar productos a un carrito, revisar su orden, y completar el pago mediante la integración con **Mercado Pago** para mayor seguridad. La aplicación está construida con **Python**, **Flask**, **MySQL** y usa la API de **Mercado Pago** para procesar pagos.
 
-## Características
+## Tecnologías Principales
 
-- **Administración de Base de Datos**: La aplicación permite la administración completa de la base de datos, incluyendo la creación, lectura, actualización y eliminación de registros.
-- **Inscripciones en Línea**: Los participantes pueden inscribirse mediante formularios en la web, y sus datos se guardan automáticamente en la base de datos.
-- **Visualización de Equipos y Puntuaciones**: La aplicación muestra un podio dinámico de equipos basado en su puntuación.
-- **Interfaz Amigable**: Diseño intuitivo y fácil de usar para la gestión de eventos deportivos.
-- **Seguridad**: Manejo seguro de datos con validación de formularios y conexión segura a la base de datos.
+- **Python**: Lenguaje de programación para el backend.
+- **Flask**: Micro-framework para crear la aplicación web.
+- **SQLAlchemy**: ORM (Object-Relational Mapping) para interactuar con la base de datos MySQL.
+- **MySQL**: Sistema de gestión de bases de datos para almacenar información de usuarios, productos, y transacciones.
+- **Mercado Pago API**: Para manejar los pagos de manera segura y eficiente.
+- **HTML/CSS/JavaScript**: Para la interfaz de usuario del lado del cliente.
 
-## Requisitos
+## Funcionalidades
 
-Asegúrate de tener instalados los siguientes requisitos en tu sistema:
+### 1. **Gestión de Carrito de Compras**
+- Los usuarios pueden agregar productos al carrito.
+- El carrito es visible en todo momento, lo que permite a los usuarios agregar o eliminar productos fácilmente.
+- Los productos se muestran con su nombre, descripción, precio y cantidad.
+- Se calcula el total del carrito en tiempo real, mostrando el precio final con base en los productos seleccionados.
 
-- Python 3.x
-- MySQL
+### 2. **Login y Registro de Usuarios**
+- Los usuarios pueden registrarse y loguearse en la aplicación.
+- La autenticación de los usuarios se maneja mediante sesiones seguras.
+- Solo los usuarios registrados pueden proceder al proceso de pago.
 
-## Instalación
+### 3. **Proceso de Pago**
+- Una vez el usuario revise su carrito, puede proceder a pagar.
+- El pago se realiza de manera segura mediante la **API de Mercado Pago**, que maneja las transacciones.
+- La aplicación genera un enlace de pago que se redirige al usuario a Mercado Pago, donde se puede completar el pago con tarjetas de crédito, débito o métodos de pago locales.
+- Una vez el pago es confirmado, el usuario es redirigido de vuelta a la aplicación con un resumen de la transacción y estado del pago.
 
-Sigue estos pasos para instalar y configurar el proyecto en tu máquina local.
 
 ### Paso 1: Clona el Repositorio
 
